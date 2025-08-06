@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Live Stream</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: black;
+      overflow: hidden;
+    }
+    #stream {
+      width: 100vw;
+      height: 100vh;
+      object-fit: contain;
+      background: black;
+    }
+  </style>
+</head>
+<body>
+  <video id="stream" controls autoplay playsinline></video>
+
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <script>
+    const video = document.getElementById('stream');
+    const streamURL = 'https://resi.media/XuvGAN/Manifest.m3u8';
+
+    if (Hls.isSupported()) {
+      const hls = new Hls({ liveSyncDuration: 3 });
+      hls.loadSource(streamURL);
+      hls.attachMedia(video);
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      video.src = streamURL;
+    } else {
+      video.outerHTML = '<p style="color: white; text-align: center;">This device does not support live streaming.</p>';
+    }
+  </script>
+</body>
+</html>
