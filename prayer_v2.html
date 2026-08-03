@@ -36,7 +36,7 @@
   </style>
 </head>
 <body>
-  <video id="stream" autoplay controls></video>
+  <video id="stream" controls autoplay playsinline></video>
   <div id="tapToStart">Click for full screen</div>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <script>
@@ -62,10 +62,8 @@
           video.requestFullscreen();
         }
       } catch (e) {
-        // Blocked — fall back to tap overlay
         overlay.style.display = 'flex';
       }
-      // Verify it actually worked; webkitEnterFullscreen can fail silently
       setTimeout(() => {
         const isFs = document.fullscreenElement || video.webkitDisplayingFullscreen;
         if (!isFs) overlay.style.display = 'flex';
