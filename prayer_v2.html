@@ -23,20 +23,21 @@
     #tapToStart {
       position: fixed;
       inset: 0;
-      background: black;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: -apple-system, sans-serif;
-      font-size: 1.2em;
       z-index: 10;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 12vh;
+      color: white;
+      font-family: -apple-system, sans-serif;
+      font-size: 1.1em;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
     }
   </style>
 </head>
 <body>
   <video id="stream" autoplay muted controls></video>
-  <div id="tapToStart">Tap to watch live</div>
+  <div id="tapToStart">Click for full screen</div>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <script>
     const video = document.getElementById('stream');
@@ -58,12 +59,9 @@
       video.muted = false;
       video.play().catch(() => {});
 
-      // iPhone: proprietary WebKit native fullscreen
       if (video.webkitEnterFullscreen) {
         video.webkitEnterFullscreen();
-      }
-      // iPad / desktop: standard Fullscreen API
-      else if (video.requestFullscreen) {
+      } else if (video.requestFullscreen) {
         video.requestFullscreen().catch(() => {});
       }
     }, { once: true });
