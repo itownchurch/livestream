@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Live Stream</title>
   <style>
     html, body {
@@ -18,14 +20,28 @@
       object-fit: contain;
       background: black;
     }
+    #tapToStart {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 12vh;
+      color: white;
+      font-family: -apple-system, sans-serif;
+      font-size: 1.1em;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+    }
   </style>
 </head>
 <body>
   <video id="stream" controls autoplay playsinline></video>
-
+  <div id="tapToStart">Click for full screen</div>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <script>
     const video = document.getElementById('stream');
+    const overlay = document.getElementById('tapToStart');
     const streamURL = 'https://resi.media/XuvGAN/Manifest.m3u8';
 
     if (Hls.isSupported()) {
@@ -37,6 +53,34 @@
     } else {
       video.outerHTML = '<p style="color: white; text-align: center;">This device does not support live streaming.</p>';
     }
+
+    function goFullscreen() {
+      try {
+        if (video.webkitEnterFullscreen) {
+          video.webkitEnterFullscreen();
+        } else if (video.requestFullscreen) {
+          video.requestFullscreen();
+        }
+      } catch (e) {
+        overlay.style.display = 'flex';
+      }
+      setTimeout(() => {
+        const isFs = document.fullscreenElement || video.webkitDisplayingFullscreen;
+        if (!isFs) overlay.style.display = 'flex';
+      }, 600);
+    }
+
+    video.addEventListener('playing', goFullscreen, { once: true });
+
+    overlay.addEventListener('click', () => {
+      overlay.style.display = 'none';
+      video.play().catch(() => {});
+      if (video.webkitEnterFullscreen) {
+        video.webkitEnterFullscreen();
+      } else if (video.requestFullscreen) {
+        video.requestFullscreen();
+      }
+    }, { once: true });
   </script>
 </body>
 </html>
