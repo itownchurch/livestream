@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Live Stream</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: black;
+      overflow: hidden;
+    }
+    #stream {
+      width: 100vw;
+      height: 100vh;
+      object-fit: contain;
+      background: black;
+    }
+    #tapToStart {
+      position: fixed;
+      inset: 0;
+      background: black;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: -apple-system, sans-serif;
+      font-size: 1.2em;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <video id="stream" autoplay muted controls></video>
+  <div id="tapToStart">Tap to watch live</div>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <script>
+    const video = document.getElementById('stream');
+    const overlay = document.getElementById('tapToStart');
+    const streamURL = 'https://resi.media/itc-fs-in/Manifest.m3u8';
+
+    if (Hls.isSupported()) {
+      const hls = new Hls({ liveSyncDuration: 3 });
+      hls.loadSource(streamURL);
+      hls.attachMedia(video);
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      video.src = streamURL;
+    } else {
+      video.outerHTML = '<p style="color: white; text-align: center;">This device does not support live streaming.</p>';
+    }
+
+    overlay.addEventListener('click', () => {
+      overlay.style.display = 'none';
+      video.muted = false;
+      video.play().catch(() => {});
+
+      // iPhone: proprietary WebKit native fullscreen
+      if (video.webkitEnterFullscreen) {
+        video.webkitEnterFullscreen();
+      }
+      // iPad / desktop: standard Fullscreen API
+      else if (video.requestFullscreen) {
+        video.requestFullscreen().catch(() => {});
+      }
+    }, { once: true });
+  </script>
+</body>
+</html>
