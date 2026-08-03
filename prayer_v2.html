@@ -24,7 +24,7 @@
       position: fixed;
       inset: 0;
       z-index: 10;
-      display: flex;
+      display: none;
       align-items: flex-end;
       justify-content: center;
       padding-bottom: 12vh;
@@ -36,7 +36,7 @@
   </style>
 </head>
 <body>
-  <video id="stream" autoplay muted controls></video>
+  <video id="stream" autoplay controls></video>
   <div id="tapToStart">Click for full screen</div>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <script>
@@ -54,11 +54,29 @@
       video.outerHTML = '<p style="color: white; text-align: center;">This device does not support live streaming.</p>';
     }
 
+    function goFullscreen() {
+      try {
+        if (video.webkitEnterFullscreen) {
+          video.webkitEnterFullscreen();
+        } else if (video.requestFullscreen) {
+          video.requestFullscreen();
+        }
+      } catch (e) {
+        // Blocked — fall back to tap overlay
+        overlay.style.display = 'flex';
+      }
+      // Verify it actually worked; webkitEnterFullscreen can fail silently
+      setTimeout(() => {
+        const isFs = document.fullscreenElement || video.webkitDisplayingFullscreen;
+        if (!isFs) overlay.style.display = 'flex';
+      }, 600);
+    }
+
+    video.addEventListener('playing', goFullscreen, { once: true });
+
     overlay.addEventListener('click', () => {
       overlay.style.display = 'none';
-      video.muted = false;
       video.play().catch(() => {});
-
       if (video.webkitEnterFullscreen) {
         video.webkitEnterFullscreen();
       } else if (video.requestFullscreen) {
